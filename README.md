@@ -6,7 +6,7 @@ All **source code** is organized into folders based on DSA topics, along with **
 
 ---
 
-## 📂 Project Structure
+## 📂 Folder Structure
 
 
 ---
