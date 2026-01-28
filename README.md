@@ -14,7 +14,6 @@ All **source code** is organized into folders based on DSA topics, along with **
 ## 📘 NOTES Folder
 
 The **NOTES** folder contains:
-- Topic-wise explanations
 - Important formulas & patterns
 - Intuition behind algorithms
 
@@ -27,6 +26,7 @@ The **NOTES** folder contains:
 - Binary Tree
 - Binary Search Tree (BST)
 - Graphs
+- Stack & Queues
 
 *(More topics will be added as I progress through the Striver A–Z playlist)*
 
@@ -43,15 +43,6 @@ The **NOTES** folder contains:
 
 - **Java**
 
----
-
-## 📈 Purpose of This Repository
-
-- Build strong **DSA fundamentals**
-- Maintain **clean, structured Java code**
-- Prepare for **coding interviews & placements**
-
----
 
 ## 🔄 Status
 
