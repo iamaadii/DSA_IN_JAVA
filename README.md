@@ -27,6 +27,7 @@ The **NOTES** folder contains:
 - Binary Search Tree (BST)
 - Graphs
 - Stack & Queues
+- Recursion
 
 *(More topics will be added as I progress through the Striver A–Z playlist)*
 
