@@ -66,4 +66,53 @@ public class Repeating_Missing_Number {
 
         System.out.println(res);
     }
+
+    public static void findMissingRepeatingNumbers() {
+        // Size of the array
+        int[] nums = {4,3,6,2,1,1};
+        int n = nums.length;
+
+        // XOR of all elements and numbers from 1 to n
+        int xr = 0;
+        for (int i = 0; i < n; i++) {
+            xr = xr ^ nums[i];     // XOR with array element
+            xr = xr ^ (i + 1);     // XOR with natural number
+        }
+
+        // Get the rightmost set bit in xr
+        int number = (xr & ~(xr - 1));
+
+        // Two groups based on this bit
+        int zero = 0, one = 0;
+
+        // Divide nums & natural numbers 1 to n into groups and XOR within each group
+        for (int i = 0; i < n; i++) {
+            if ((nums[i] & number) != 0) {
+                one ^= nums[i];
+            } else {
+                zero ^= nums[i];
+            }
+
+            if (((i+1) & number) != 0) {
+                one ^= i;
+            } else {
+                zero ^= i;
+            }
+        }
+
+        // Check which is repeating and which is missing
+        int cnt = 0;
+        for (int val : nums) {
+            if (val == zero) cnt++;
+        }
+
+        if (cnt == 2) {
+            System.out.println("Repeating: "+zero); // zero is repeating
+            System.out.println("Missing: "+one); // one is missing
+        }
+        else{
+            System.out.println("Repeating: "+one); // one is repeating
+            System.out.println("Missing: "+zero); // zero is missing
+        }
+    }
 }
