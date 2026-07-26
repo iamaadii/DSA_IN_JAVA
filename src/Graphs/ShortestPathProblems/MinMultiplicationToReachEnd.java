@@ -37,6 +37,32 @@ public class MinMultiplicationToReachEnd {
         }
         return -1;
     }
+
+    public int minSteps(int[] arr, int start, int end) {
+        if (start == end) return 0;
+        int[] vis = new int[1000];
+        Arrays.fill(vis,-1);
+
+        Queue<Pair> q = new LinkedList<>();
+        q.add(new Pair(start,0));
+        vis[start] = 0;
+        while(!q.isEmpty()){
+            Pair p = q.poll();
+            int currNum = p.num;
+            int currStep = p.step;
+
+            for(int e: arr){
+                int newNum = (currNum * e)%1000;
+                if(vis[newNum]==-1) {
+                    q.add(new Pair(newNum,currStep+1));
+                    vis[newNum] = currStep+1;
+                    if(newNum==end) return currStep+1;
+                }
+            }
+        }
+        return -1;
+    }
+
     public static void main(String[] args) {
         int[] arr = new int[]{2,5,7};
         System.out.println(optimal(arr,3,30));

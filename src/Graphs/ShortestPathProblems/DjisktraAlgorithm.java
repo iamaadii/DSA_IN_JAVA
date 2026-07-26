@@ -34,7 +34,7 @@ public class DjisktraAlgorithm {
 
         int[] dist = new int[V];
         Arrays.fill(dist,Integer.MAX_VALUE);
-        PriorityQueue<Pair> q = new PriorityQueue<>((a, b) -> a.dist - b.dist);
+        PriorityQueue<Pair> q = new PriorityQueue<>(Comparator.comparingInt(a -> a.dist));
         q.add(new Pair(src,0));
         dist[src] = 0;
         while (!q.isEmpty()){

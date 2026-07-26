@@ -5,35 +5,44 @@ import java.util.*;
 public class DisjointSetUsingSize {
 
      static class DisjointSet {
-        List<Integer> size = new ArrayList<>();
-        List<Integer> parent = new ArrayList<>();
-        DisjointSet(int n) {
-            for (int i = 0; i < n; i++) {
-                size.add(1);
-                parent.add(i);
-            }
-        }
-        int findUltimateParent(int node){
-            if (node== parent.get(node)) return node;
-            int up = findUltimateParent(parent.get(node));
-            parent.set(node,up);
-            return parent.get(node);
-        }
+         int[] size;
+         int[] parent;
+
+         int findUltimateParent(int node){
+             if(parent[node]==node){
+                 return node;
+             }
+             return parent[node] = findUltimateParent(parent[node]);
+         }
+
+
          void unionBySize(int u, int v){
-            int ultimateU = findUltimateParent(u); int ultimateV = findUltimateParent(v);
-            if (ultimateV==ultimateU) return;
+             int ultimateU = findUltimateParent(u);
+             int ultimateV = findUltimateParent(v);
 
-            int sizeU = size.get(ultimateU); int sizeV = size.get(ultimateV);
-            if(sizeV < sizeU){
-                parent.set(ultimateV,ultimateU);
-                size.set(ultimateU,sizeU+sizeV);
-            }
-            else{
-                parent.set(ultimateU,ultimateV);
-                size.set(ultimateV,sizeV+sizeU);
-            }
+             if(ultimateU==ultimateV) return;
 
-        }
+             int sizeU = size[ultimateU];
+             int sizeV = size[ultimateV];
+
+             if(sizeU<sizeV){
+                 parent[ultimateU] = ultimateV;
+                 size[ultimateV] += size[ultimateU];
+             }
+             else{
+                 parent[ultimateV] = ultimateU;
+                 size[ultimateU] += size[ultimateV];
+             }
+         }
+
+         DisjointSet(int n) {
+             size = new int[n];
+             parent = new int[n];
+             for (int i = 0; i<n; i++) {
+                 size[i] = 1;
+                 parent[i] = i;
+             }
+         }
     }
 
     public static void main(String[] args) {

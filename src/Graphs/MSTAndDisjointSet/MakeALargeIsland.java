@@ -6,76 +6,106 @@ An island is a 4-directionally connected group of 1s.
 package Graphs.MSTAndDisjointSet;
 import java.util.*;
 public class MakeALargeIsland {
-    static class Disjoint {
-        List<Integer> size = new ArrayList<>();
-        List<Integer> parent = new ArrayList<>();
-        Disjoint(int n) {
+    static class DisjointSet {
+        int[] size;
+        int[] parent;
+
+        int findUltimateParent(int node) {
+            if (parent[node] == node) {
+                return node;
+            }
+            return parent[node] = findUltimateParent(parent[node]);
+        }
+
+        void unionBySize(int u, int v) {
+            int ultimateU = findUltimateParent(u);
+            int ultimateV = findUltimateParent(v);
+
+            if (ultimateU == ultimateV)
+                return;
+
+            int sizeU = size[ultimateU];
+            int sizeV = size[ultimateV];
+
+            if (sizeU < sizeV) {
+                parent[ultimateU] = ultimateV;
+                size[ultimateV] += size[ultimateU];
+            } else {
+                parent[ultimateV] = ultimateU;
+                size[ultimateU] += size[ultimateV];
+            }
+        }
+
+        DisjointSet(int n) {
+            size = new int[n];
+            parent = new int[n];
             for (int i = 0; i < n; i++) {
-                size.add(1);
-                parent.add(i);
+                size[i] = 1;
+                parent[i] = i;
             }
         }
-        int findUltimateParent(int node){
-            if (node== parent.get(node)) return node;
-            int up = findUltimateParent(parent.get(node));
-            parent.set(node,up);
-            return parent.get(node);
-        }
-        void unionBySize(int u, int v){
-            int ultimateU = findUltimateParent(u); int ultimateV = findUltimateParent(v);
-            if (ultimateV==ultimateU) return;
-
-            int sizeU = size.get(ultimateU); int sizeV = size.get(ultimateV);
-            if(sizeV < sizeU){
-                parent.set(ultimateV,ultimateU);
-                size.set(ultimateU,sizeU+sizeV);
-            }
-            else{
-                parent.set(ultimateU,ultimateV);
-                size.set(ultimateV,sizeV+sizeU);
-            }
-        }
-
     }
     static int optimal(int[][] grid) {
         int n = grid.length;
-        Disjoint obj = new Disjoint(n*n);
-        int[] rows = {-1,0,1,0}; int[] cols = {0,-1,0,1};
-        List<List<Integer>> l = new ArrayList<>();
-        for(int i=0;i<n;i++) {
-            for(int j=0;j<n;j++){
-                if(grid[i][j]==0) l.add(Arrays.asList(i,j));
-                else if (grid[i][j] == 1) {
-                    int u = i * n + j;
-                    for (int d = 0; d < 4; d++) {
-                        int nr = i + rows[d];
-                        int nc = j + cols[d];
-                        if (nr >= 0 && nr < n && nc >= 0 && nc < n && grid[nr][nc] == 1) {
-                            int v = nr * n + nc;
-                            obj.unionBySize(u, v);
+        int m = grid[0].length;
+
+        int[] rows = { 0, -1, 0, 1 };
+        int[] cols = { -1, 0, 1, 0 };
+
+        DisjointSet d = new DisjointSet(n * m);
+        List<List<Integer>> zeroNodes = new ArrayList<>();
+
+        for (int r = 0; r < n; r++) {
+            for (int c = 0; c < m; c++) {
+                if (grid[r][c] == 0) {
+                    zeroNodes.add(Arrays.asList(r, c));
+                }
+                else if (grid[r][c] == 1) {
+                    for (int k = 0; k < 4; k++) {
+                        int nr = rows[k] + r;
+                        int nc = cols[k] + c;
+
+                        if (nr >= 0 && nr < n && nc >= 0 && nc < m && grid[nr][nc] == 1) {
+                            int u = m * r + c;
+                            int v = m * nr + nc;
+
+                            int ultimateU = d.findUltimateParent(u);
+                            int ultimateV = d.findUltimateParent(v);
+
+                            if (ultimateU != ultimateV) {
+                                d.unionBySize(u, v);
+                            }
                         }
                     }
                 }
             }
         }
 
-        if(l.isEmpty()) return n*n;
+        if (zeroNodes.size() == 0){
+            return n * m;
+        }
+
         int ans = 0;
-        for(int i=0;i<l.size();i++){
-            int r = l.get(i).get(0); int c = l.get(i).get(1);
-            int temp = 1;
-            Set<Integer> st = new HashSet<>();
-            for(int iter = 0;iter<4;iter++){
-                int nr = rows[iter]+r;
-                int nc = cols[iter]+c;
-                if(nr>=0 && nr<n && nc>=0 && nc<n){
-                    if(grid[nr][nc]==1) st.add(obj.findUltimateParent(nr*n+nc));
+        for (List<Integer> node : zeroNodes) {
+            int r = node.get(0);
+            int c = node.get(1);
+
+            Set<Integer> temp = new HashSet<>();
+            for (int i = 0; i < 4; i++) {
+                int nr = rows[i] + r;
+                int nc = cols[i] + c;
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m && grid[nr][nc] == 1) {
+                    int v = m * nr + nc;
+                    int ultimateV = d.findUltimateParent(v);
+                    temp.add(ultimateV);
                 }
             }
-            for(int val: st){
-                temp += obj.size.get(val);
+
+            int noOfNodes = 1;
+            for (int p : temp) {
+                noOfNodes += d.size[p];
             }
-            ans = Math.max(ans,temp);
+            ans = Math.max(ans, noOfNodes);
         }
         return ans;
     }

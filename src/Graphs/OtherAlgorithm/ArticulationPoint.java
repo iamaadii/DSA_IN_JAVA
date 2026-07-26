@@ -5,49 +5,53 @@ Note: Indexing is zero-based i.e nodes numbering from (0 to V-1). There might be
 package Graphs.OtherAlgorithm;
 import java.util.*;
 public class ArticulationPoint {
-    static void dfs(int curr,int parent, ArrayList<ArrayList<Integer>> adj,int[] vis,int[] timeOfInsertion,int[] lowestTime, int[] count, boolean[] articulationPoint){
-        vis[curr] = 1;
-        timeOfInsertion[curr] = lowestTime[curr] = count[0];
-        count[0]+=1;
+
+    static int[] visited;
+    static int[] timeOfInsertion;
+    static int[] lowestTime;
+    static List<List<Integer>> adj;
+
+    static void dfs(int curr,int parent, int timer,boolean[] articulationPoint){
+        visited[curr] = 1;
+        timeOfInsertion[curr] = timer;
+        lowestTime[curr] = timer;
+
         int child=0;
         for(int nei: adj.get(curr)){
             if(nei==parent) continue;
-            else if(vis[nei]==0){
-                dfs(nei,curr,adj,vis,timeOfInsertion,lowestTime,count,articulationPoint);
+            else if(visited[nei]==0){
+                dfs(nei,curr,timer+1,articulationPoint);
                 lowestTime[curr] = Math.min(lowestTime[nei],lowestTime[curr]);
                 if(lowestTime[nei] >= timeOfInsertion[curr] && parent != -1 ){
                     articulationPoint[curr] = true;
                 }
                 child+=1;
             }
-            else lowestTime[curr] = Math.min(timeOfInsertion[nei],lowestTime[curr]);
+            else {
+                lowestTime[curr] = Math.min(timeOfInsertion[nei],lowestTime[curr]);
+            }
         }
         if(parent==-1 && child>1){
             articulationPoint[curr] = true;
         }
     }
+
+
     static ArrayList<Integer> optimal(int n, ArrayList<ArrayList<Integer>> adj) {
-        int[] vis  = new int[n];
-        int[] timeOfInsertion = new int[n];
-        int[] lowestTime = new int[n];
-        int[] count = {0};
+        visited = new int[n];
+        timeOfInsertion = new int[n];
+        lowestTime = new int[n];
+
         boolean[] articulationPoint = new boolean[n];
-        Arrays.fill(articulationPoint,false);
-        for(int i=0;i<n;i++){
-            if(vis[i]==0){
-                dfs(i,-1,adj,vis,timeOfInsertion,lowestTime,count,articulationPoint);
-            }
-        }
+        dfs(0,-1,0,articulationPoint);
 
         ArrayList<Integer> ans = new ArrayList<>();
-        for(int i=0;i<n;i++){
-            if(articulationPoint[i]) ans.add(i);
+        for(int node=0;node<n;node++){
+            if(articulationPoint[node]==true) {
+                ans.add(node);
+            }
         }
         if(ans.isEmpty()) ans.add(-1);
         return ans;
-    }
-
-    public static void main(String[] args) {
-
     }
 }

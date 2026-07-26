@@ -4,31 +4,31 @@ import java.util.*;
 
 public class DisjointSetUsingRank {
      static class DisjointSet {
-        List<Integer> rank = new ArrayList<>();
-        List<Integer> parent = new ArrayList<>();
+        int[] rank;
+        int[] parent;
         DisjointSet(int n) {
-            for (int i = 0; i < n; i++) {
-                rank.add(0);
-                parent.add(i);
+            rank = new int[n];
+            parent = new int[n];
+            for (int i = 0; i < n; i++){
+                parent[i]=i;
             }
         }
         int findUltimateParent(int node){
-            if (node== parent.get(node))  return node;
-            int up = findUltimateParent(parent.get(node));
-            parent.set(node,up);
-            return parent.get(node);
+            if (node== parent[node])  return node;
+            return parent[node] = findUltimateParent(parent[node]);
         }
 
         void unionByRank(int u, int v){
             int ultimateU = findUltimateParent(u); int ultimateV = findUltimateParent(v);
             if (ultimateU==ultimateV) return;
 
-            int rankU = rank.get(ultimateU);int rankV = rank.get(ultimateV);
-            if(rankU < rankV)  parent.set(ultimateU,ultimateV);
-            else if(rankV < rankU)  parent.set(ultimateV,ultimateU);
+            int rankU = rank[ultimateU];
+            int rankV = rank[ultimateV];
+            if(rankU < rankV)  parent[ultimateU]=ultimateV;
+            else if(rankV < rankU)  parent[ultimateV]=ultimateU;
             else{
-                parent.set(ultimateV,ultimateU);
-                rank.set(ultimateU,rankU+1);
+                parent[ultimateV]=ultimateU;
+                rank[ultimateU]=rankU+1;
             }
         }
     }

@@ -6,75 +6,99 @@ Given an array stones of length n where stones[i] = [xi, yi] represents the loca
 package Graphs.MSTAndDisjointSet;
 import java.util.*;
 public class MostStonesRemovedWithSameRowAndSameCol {
-    static class Disjoint{
-        List<Integer> size = new ArrayList<>();
-        List<Integer> parent = new ArrayList<>();
-        Disjoint(int n) {
-            for (int i = 0; i < n; i++) {
-                size.add(1);
-                parent.add(i);
-            }
-        }
+
+    static class DisjointSet {
+        int[] size;
+        int[] parent;
+
         int findUltimateParent(int node){
-            if (node== parent.get(node)){
+            if(parent[node]==node){
                 return node;
             }
-            int up = findUltimateParent(parent.get(node));
-            parent.set(node,up);
-            return parent.get(node);
+            return parent[node] = findUltimateParent(parent[node]);
         }
+
 
         void unionBySize(int u, int v){
             int ultimateU = findUltimateParent(u);
             int ultimateV = findUltimateParent(v);
 
-            if (ultimateV==ultimateU) {
-                return;
-            }
+            if(ultimateU==ultimateV) return;
 
-            int sizeU = size.get(ultimateU);
-            int sizeV = size.get(ultimateV);
+            int sizeU = size[ultimateU];
+            int sizeV = size[ultimateV];
 
-            if(sizeV < sizeU){
-                parent.set(ultimateV,ultimateU);
-                size.set(ultimateU,sizeU+sizeV);
+            if(sizeU<sizeV){
+                parent[ultimateU] = ultimateV;
+                size[ultimateV] += size[ultimateU];
             }
             else{
-                parent.set(ultimateU,ultimateV);
-                size.set(ultimateV,sizeV+sizeU);
+                parent[ultimateV] = ultimateU;
+                size[ultimateU] += size[ultimateV];
+            }
+        }
+
+        DisjointSet(int n) {
+            size = new int[n];
+            parent = new int[n];
+            for (int i = 0; i<n; i++) {
+                size[i] = 1;
+                parent[i] = i;
             }
         }
     }
-    static void optimal(int[][] stones) {
-        int totalRows = 0;
-        int totalCols = 0;
-        for(int i=0;i<stones.length;i++){
-            totalRows = Math.max(totalRows,stones[i][0]);
-            totalCols = Math.max(totalCols,stones[i][1]);
-        }
 
-        int n= totalRows+totalCols+2;
-        HashMap<Integer,Integer> mp = new HashMap<>();
-        Disjoint obj = new Disjoint(n);
-        for(int i=0;i<stones.length;i++){
-            int row = stones[i][0];
-            int col = stones[i][1] + totalRows + 1;
-            obj.unionBySize(row,col);
-            mp.put(row,1);
-            mp.put(col,1);
-        }
-
-        int count = 0;
-        for (Map.Entry<Integer,Integer> e: mp.entrySet()){
-            if (obj.findUltimateParent(e.getKey()) == e.getKey()){
-                count+=1;
+    public static int approach1(int[][] stones) {
+        int n = stones.length;
+        DisjointSet d = new DisjointSet(n);
+        for (int u = 0; u < n; u++) {
+            int r = stones[u][0];
+            int c = stones[u][1];
+            for (int v = u + 1; v < n; v++) {
+                if (stones[v][0] == r || stones[v][1] == c) {
+                    d.unionBySize(u, v);
+                }
             }
         }
-        System.out.println(stones.length - count);
+        int totalComp = 0;
+        for (int i = 0; i < n; i++) {
+            if (d.findUltimateParent(i) == i) {
+                totalComp += 1;
+            }
+        }
+        return n - totalComp;
+    }
+
+    static int approach2(int[][] stones) {
+        int n = stones.length;
+        int totalRows = 0;
+        int totalCols = 0;
+        for (int i = 0; i < n; i++) {
+            totalRows = Math.max(totalRows, stones[i][0]);
+            totalCols = Math.max(totalCols, stones[i][1]);
+        }
+
+        int m = totalRows + totalCols + 2;
+        DisjointSet obj = new DisjointSet(m);
+        for (int i = 0; i < n; i++) {
+            int row = stones[i][0];
+            int col = stones[i][1] + totalRows + 1;
+            obj.unionBySize(row, col);
+        }
+
+        int totalComp = 0;
+        for (int i = 0; i < m; i++) {
+            int ultimate = obj.findUltimateParent(i);
+            if (ultimate == i && obj.size[ultimate] > 1) {
+                totalComp += 1;
+            }
+        }
+        return stones.length - totalComp;
     }
 
     public static void main(String[] args) {
         int[][] edges = {{0,1},{1,1}};
-        optimal(edges);
+        System.out.println(approach1(edges));
+        System.out.println(approach2(edges));
     }
 }

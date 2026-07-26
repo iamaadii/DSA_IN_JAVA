@@ -2,59 +2,62 @@ package Graphs.MSTAndDisjointSet;
 
 import java.util.*;
 public class KruskalAlgorithm {
-    static class DisJointSet{
-        List<Integer> size = new ArrayList<>();
-        List<Integer> parent = new ArrayList<>();
-        DisJointSet(int n){
-            for (int i = 0; i < n; i++) {
-                size.add(1);
-                parent.add(i);
+    static class DisjointSet {
+        int[] rank;
+        int[] parent;
+        DisjointSet(int n) {
+            rank = new int[n];
+            parent = new int[n];
+            for (int i = 0; i < n; i++){
+                parent[i]=i;
             }
         }
-
-        int findUltimate(int node){
-            if (parent.get(node)==node){
-                return node;
-            }
-            int temp = findUltimate(parent.get(node));
-            parent.set(node,temp);
-            return temp;
+        int findUltimateParent(int node){
+            if (node== parent[node])  return node;
+            return parent[node] = findUltimateParent(parent[node]);
         }
 
-        void unionBySize(int u, int v, int w, int[] sum, List<List<Integer>> res){
-            int uRootNode = findUltimate(u);
-            int vRootNode = findUltimate(v);
+        void unionByRank(int u, int v){
+            int ultimateU = findUltimateParent(u); int ultimateV = findUltimateParent(v);
+            if (ultimateU==ultimateV) return;
 
-            if (uRootNode==vRootNode) return;
-
-            sum[0] += w;
-            res.add(Arrays.asList(u,v));
-            int uSize = size.get(uRootNode);
-            int vSize = size.get(vRootNode);
-
-            if (vSize < uSize){
-                parent.set(vRootNode,uRootNode);
-                size.set(uRootNode,uSize+vSize);
-            }
+            int rankU = rank[ultimateU];
+            int rankV = rank[ultimateV];
+            if(rankU < rankV)  parent[ultimateU]=ultimateV;
+            else if(rankV < rankU)  parent[ultimateV]=ultimateU;
             else{
-                parent.set(uRootNode,vRootNode);
-                size.set(vRootNode,uSize+vSize);
+                parent[ultimateV]=ultimateU;
+                rank[ultimateU]=rankU+1;
             }
         }
     }
 
     static void optimal(int n, int[][] edges){
-        DisJointSet obj = new DisJointSet(n);
         Arrays.sort(edges,(a,b)->a[2]-b[2]);
 
-        List<List<Integer>> result = new ArrayList<>();
-        int[] sum = {0};
+        DisjointSet d = new DisjointSet(n);
+        List<List<Integer>> connectedEdges = new ArrayList<>();
+        int totalWeight = 0;
         for (int i=0;i<edges.length;i++){
-            obj.unionBySize(edges[i][0],edges[i][1],edges[i][2],sum,result);
-        }
+            int u = edges[i][0];
+            int v = edges[i][1];
+            int w = edges[i][2];
 
-        System.out.println(sum[0]);
-        System.out.println(result);
+            int ultimateU = d.findUltimateParent(u);
+            int ultimateV = d.findUltimateParent(v);
+
+            if(ultimateU != ultimateV){
+                d.unionByRank(edges[i][0],edges[i][1]);
+                totalWeight += w;
+                List<Integer> temp = new ArrayList<>();
+                temp.add(u);
+                temp.add(v);
+                connectedEdges.add(temp);
+            }
+
+        }
+        System.out.println(totalWeight);
+        System.out.println(connectedEdges);
     }
 
     public static void main(String[] args) {

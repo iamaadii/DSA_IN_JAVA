@@ -6,6 +6,7 @@ Note: A fully connected component is a subgraph of a given graph such that there
 package Graphs.OtherAlgorithm;
 import java.util.*;
 public class NumberOfGoodComponents {
+
     static void dfs(int n, List<List<Integer>> adj, int[] vis,List<Integer> l){
         vis[n] = 1;
         l.add(n);
@@ -15,9 +16,10 @@ public class NumberOfGoodComponents {
             }
         }
     }
+
     public static int optimal(int V, int[][] edges) {
         List<List<Integer>> adj = new ArrayList<>();
-        int[] inDegree = new int[V+1];
+        int[] degree = new int[V+1];
         for(int i=0;i<V+1;i++){
             adj.add(new ArrayList<>());
         }
@@ -26,32 +28,39 @@ public class NumberOfGoodComponents {
             int v = e[1];
             adj.get(u).add(v);
             adj.get(v).add(u);
-            inDegree[u]+=1;
-            inDegree[v]+=1;
+            degree[u]+=1;
+            degree[v]+=1;
         }
 
         int[] vis = new int[V+1];
-        List<List<Integer>> traversal = new ArrayList<>();
+        List<List<Integer>> components = new ArrayList<>();
         for(int i=1;i<vis.length;i++){
             if(vis[i]==0){
                 List<Integer> l = new ArrayList<>();
                 dfs(i,adj,vis,l);
-                traversal.add(l);
+                components.add(l);
             }
         }
-        int res = 0;
-        for(int i=0;i<traversal.size();i++){
-            int j=0;
-            int size = traversal.get(i).size();
-            while(j<size && (inDegree[traversal.get(i).get(j)] == size-1)){
-                j++;
+        System.out.println(components);
+        System.out.println(Arrays.toString(degree));
+
+        int noOfGoodComponents = 0;
+        for(List<Integer> component: components){
+            int size = component.size();
+            boolean flag = true;
+            for(int node: component){
+                if (degree[node] != size - 1) {
+                    flag = false;
+                    break;
+                }
             }
-            if(j==size) res+=1;
+            if(flag){
+                noOfGoodComponents+=1;
+            }
         }
-        System.out.println(Arrays.toString(inDegree));
-        System.out.println(traversal);
-        return res;
+        return noOfGoodComponents;
     }
+
     public static void main(String[] args) {
         int[][] edges = {{1, 2} ,{7, 2}, {3, 5}, {3, 4}, {4, 5}};
         System.out.println(optimal(7,edges));

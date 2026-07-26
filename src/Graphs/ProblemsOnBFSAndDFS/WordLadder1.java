@@ -18,22 +18,26 @@ public class WordLadder1 {
         }
     }
     static int optimal(String beginWord, String endWord, List<String> wordList){
-        if(!wordList.contains(endWord)) return 0;
+        if(!wordList.contains(endWord))
+            return 0;
 
         Set<String> set = new HashSet<>(wordList);
         Queue<Pair> q = new LinkedList<>();
         q.add(new Pair(beginWord,1));
         set.remove(beginWord);
+
         int count = 0;
         while (!q.isEmpty()){
             Pair p = q.poll();
             String word = p.s;
             int dist = p.level;
             if(word.equals(endWord)){
-                count=dist; break;
+                count=dist;
+                break;
             }
+            char[] arr = word.toCharArray();
             for (int i = 0; i < word.length(); i++) {
-                char[] arr = word.toCharArray();
+                char original = arr[i];
                 for (char c = 'a'; c <= 'z'; c++) {
                     arr[i] = c;
                     String next = new String(arr);
@@ -42,6 +46,7 @@ public class WordLadder1 {
                         set.remove(next);
                     }
                 }
+                arr[i] = original;
             }
         }
         return count;

@@ -1,8 +1,11 @@
 /*
-You are given an n × n matrix grid where grid[i][j] is the unique elevation of cell (i, j).
-Rain starts falling at time t = 0. At any later time t ≥ 0, every cell is covered by water to depth t.
-You may move 4-directionally (up, down, left, right) between adjacent cells instantaneously iff the elevations of both cells are ≤ t.
-Starting from the top-left cell (0, 0), return the minimum time t at which you can reach the bottom-right cell (n − 1, n − 1).
+You are given an n x n integer matrix grid where each value grid[i][j] represents the elevation at that point (i, j).
+
+It starts raining, and water gradually rises over time. At time t, the water level is t, meaning any cell with elevation less than equal to t is submerged or reachable.
+
+You can swim from a square to another 4-directionally adjacent square if and only if the elevation of both squares individually are at most t. You can swim infinite distances in zero time. Of course, you must stay within the boundaries of the grid during your swim.
+
+Return the minimum time until you can reach the bottom right square (n - 1, n - 1) if you start at the top left square (0, 0).
 */
 package Graphs.MSTAndDisjointSet;
 import java.util.*;

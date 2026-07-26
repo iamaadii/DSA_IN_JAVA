@@ -4,63 +4,71 @@ You are given an initial computer network connections. You can extract certain c
 Return the minimum number of times you need to do this in order to make all the computers connected. If it is not possible, return -1.
 */
 package Graphs.MSTAndDisjointSet;
-import java.util.*;
 
 public class MinNumberOfOperationRequiredToMakeComponentsConnected {
     static class DisjointSet {
-        List<Integer> size = new ArrayList<>();
-        List<Integer> parent = new ArrayList<>();
-        DisjointSet(int n) {
-            for (int i = 0; i < n; i++) {
-                size.add(1);
-                parent.add(i);
-            }
-        }
+        int[] size;
+        int[] parent;
+
         int findUltimateParent(int node){
-            if (node== parent.get(node)){
+            if(parent[node]==node){
                 return node;
             }
-            int up = findUltimateParent(parent.get(node));
-            parent.set(node,up);
-            return parent.get(node);
+            return parent[node] = findUltimateParent(parent[node]);
         }
 
-        void unionBySize(int u, int v, int[] extraEdges){
+
+        void unionBySize(int u, int v){
             int ultimateU = findUltimateParent(u);
             int ultimateV = findUltimateParent(v);
 
-            if (ultimateV==ultimateU) {
-                extraEdges[0] += 1;
-                return;
-            }
+            if(ultimateU==ultimateV) return;
 
-            int sizeU = size.get(ultimateU);
-            int sizeV = size.get(ultimateV);
+            int sizeU = size[ultimateU];
+            int sizeV = size[ultimateV];
 
-            if(sizeV < sizeU){
-                parent.set(ultimateV,ultimateU);
-                size.set(ultimateU,sizeU+sizeV);
+            if(sizeU<sizeV){
+                parent[ultimateU] = ultimateV;
+                size[ultimateV] += size[ultimateU];
             }
             else{
-                parent.set(ultimateU,ultimateV);
-                size.set(ultimateV,sizeV+sizeU);
+                parent[ultimateV] = ultimateU;
+                size[ultimateU] += size[ultimateV];
             }
+        }
 
+        DisjointSet(int n) {
+            size = new int[n];
+            parent = new int[n];
+            for (int i = 0; i<n; i++) {
+                size[i] = 1;
+                parent[i] = i;
+            }
         }
     }
+
     static int optimal(int n, int[][] edges){
-        DisjointSet obj = new DisjointSet(n);
-        int[] extraEdges = {0};
-        for (int i=0;i< edges.length;i++){
-            obj.unionBySize(edges[i][0],edges[i][1],extraEdges);
+        if(edges.length < n-1){
+            return -1;
         }
 
-        int totalComponents = 0;
-        for (int i=0;i<n;i++){
-            if (obj.parent.get(i)==i)
-                totalComponents+=1;
+        DisjointSet obj = new DisjointSet(n);
+        int extraEdges = 0;
+        int totalComponents = n;
+        for (int i=0;i< edges.length;i++){
+            int u = edges[i][0];
+            int v = edges[i][1];
+            if(obj.findUltimateParent(u) == obj.findUltimateParent(v)){
+                extraEdges+=1;
+            }
+            else {
+                obj.unionBySize(u,v);
+                totalComponents -= 1;
+            }
         }
-        if (extraEdges[0] >= totalComponents-1) return totalComponents-1;
+        if (extraEdges >= totalComponents-1) {
+            return totalComponents-1;
+        }
         return -1;
     }
 
